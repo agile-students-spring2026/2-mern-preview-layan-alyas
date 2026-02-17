@@ -1,8 +1,10 @@
 require('dotenv').config({ silent: true }) // load environmental variables from a hidden file named .env
+
 const express = require('express') // CommonJS import style!
 const morgan = require('morgan') // middleware for nice logging of incoming HTTP requests
 const cors = require('cors') // middleware for enabling CORS (Cross-Origin Resource Sharing) requests.
 const mongoose = require('mongoose')
+const path = require('path')
 
 const app = express() // instantiate an Express object
 app.use(morgan('dev', { skip: (req, res) => process.env.NODE_ENV === 'test' })) // log all incoming requests, except when in unit test mode.  morgan has a few logging default styles - dev is a nice concise color-coded style
@@ -12,6 +14,21 @@ app.use(cors()) // allow cross-origin resource sharing
 app.use(express.json()) // decode JSON-formatted incoming POST data
 app.use(express.urlencoded({ extended: true })) // decode url-encoded incoming POST data
 
+//serve image
+app.use('/images', express.static(path.join(__dirname, 'public/images')))
+
+//About Us
+app.get('/api/about', (req, res) => {
+  res.json({
+    title: 'About Us',
+    paragraphs: [
+      "Hello, I’m Layan. I’m a junior studying computer science student at NYU.",
+      "This page is a part of a MERN stack exercise, specifically where the front-end fetches content from the back-end.",
+      "I’m passionate about building products that feel simple, useful, and well-designed."
+    ],
+    imageUrl: '/images/me.jpg'
+  })
+})
 // connect to database
 mongoose
   .connect(`${process.env.DB_CONNECTION_STRING}`)
